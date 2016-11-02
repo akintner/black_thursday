@@ -5,6 +5,9 @@ require './lib/item_repo'
 class ItemRepoTest < Minitest::Test
   #This is a way to make it push to master branch
 
+  def method
+  end
+  
   def test_it_has_a_class
     i = ItemRepo.new
     assert_equal ItemRepo, i.class

@@ -4,6 +4,10 @@ require 'pry'
 
 class ItemRepo
   #This is a way to make it push to master branch
+
+  def method
+  end
+
   def initialize
     # @parent = SalesEngine.new
     @all = []
