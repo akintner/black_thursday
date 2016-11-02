@@ -3,17 +3,11 @@ require 'csv'
 require 'pry'
 
 class ItemRepo
-  attr_reader :all
   def initialize
     # @parent = SalesEngine.new
     @all = []
   end
-
-  def set_up(file)
-    file = CSV.read "./data/items.csv", headers: true, header_converters: :symbol
-    parse_file(file)
-  end
-
+ 
   def all
     @all
   end

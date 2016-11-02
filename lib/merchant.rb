@@ -5,26 +5,16 @@ class Merchant
   attr_reader :id,
               :name,
               :created_at,
-              :updated_at
+              :updated_at,
+              :parent
 
   def initialize(data)
-    data = CSV.open "./data/merchants.csv", headers: true, header_converters: :symbol
-
-    data.each do |row|
-      @id = row[0]
-      @name = row[1]
-      @created_at = row[2]
-      @updated_at = row[3]
-    end
+      # @parent = repo
+      @id = data[:id].to_i
+      @name = data[:name].to_s
+      @created_at = data[:created_at]
+      @updated_at = data[:updated_at]
   end
 end
 
-m = Merchant.new({:id => 5, :name => "Turing School"})
 
-  puts m.id
-
-  puts m.name
-
-  puts m.created_at
-
-  puts m.updated_at
