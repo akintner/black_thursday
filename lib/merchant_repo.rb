@@ -25,9 +25,10 @@ class MerchantRepo
   end
 
   def find_by_id(desired_id)
-    @all.find do |merchant| 
-       merchant.id == desired_id.to_i
+    m = @all.find do |merchant| 
+       merchant.id == desired_id
     end
+    m
   end
 
   def find_by_name(desired_name)
@@ -40,6 +41,10 @@ class MerchantRepo
     @all.find_all do |merchant|
       merchant.name.downcase.include?(fragment)
     end
+  end
+
+  def find_all_by_merchant_id(id)
+    @parent.find_all_by_merchant_id(id)
   end
 
 end
