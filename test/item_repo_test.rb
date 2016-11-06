@@ -1,6 +1,6 @@
 require 'minitest/autorun'
 require 'minitest/pride'
-require './lib/item_repo'
+require_relative '../lib/item_repo'
 require 'csv'
 require 'pry'
 
@@ -31,7 +31,7 @@ class ItemRepoTest < Minitest::Test
   def test_it_can_find_by_name
     i = ItemRepo.new(file, sales_engine)
     name = "Collection Jade, Composition : 2 lanières cuir veau 5 mm"
-    assert_equal 263402963,i.find_by_name(name)
+    assert_equal 263402963, i.find_by_name(name)
   end
 
   def test_it_can_find_item_price_by_id

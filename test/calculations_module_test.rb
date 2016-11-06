@@ -1,7 +1,6 @@
 require 'minitest/autorun'
 require 'minitest/pride'
-require './lib/calculations_module'
-require 'simplecov'
+require_relative '../lib/calculations_module'
 
 class CalculationsTest < Minitest::Test
 include Calculations

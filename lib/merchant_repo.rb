@@ -1,7 +1,6 @@
-require './lib/merchant'
+require_relative '../lib/merchant'
 require 'csv'
 require 'pry'
-require './lib/sales_engine'
 
 class MerchantRepo
   attr_reader :name,
@@ -18,8 +17,8 @@ class MerchantRepo
   end
 
   def file_reader(file)
-    contents = CSV.open(file, headers:true, header_converters: :symbol)
-    contents.each do |merchant|
+    contents = CSV.open(file, headers:true, header_converters: :symbol) 
+    contents.map do |merchant|
        @all << Merchant.new(merchant, self)
     end
   end
@@ -32,8 +31,10 @@ class MerchantRepo
   end
 
   def find_by_name(desired_name)
-    desired_name.to_s.downcase
-    @all.find {|merchant| merchant.name == desired_name}
+    m = @all.find do |merchant| 
+      merchant.name.downcase == desired_name.downcase
+    end
+    m
   end
 
   def find_all_by_name(fragment)
@@ -50,6 +51,7 @@ class MerchantRepo
   def find_all_invoices_by_id(id)
     @parent.find_all_invoices_by_id(id)
   end
-
+  
 end
+
 
