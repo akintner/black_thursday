@@ -140,6 +140,22 @@ class SalesAnalyst
     end
   end
 
+  def total_revenue_by_date(date)
+    date = Time.parse(date.to_s).strftime("%D")
+    invoices_array = se.invoices.all.find_all do |invoice|
+      invoice.created_at.strftime("%D") == date
+    end
+    sum = invoices_array.reduce(0) do |sum, invoice|
+      sum += invoice.total
+    end
+    BigDecimal.new(sum).round(2)
+  end
+
+  def top_revenue_earners(num = 20)
+    #returns the specified number of top revenue earners
+    #if no num is provided, it provides the top 20 merchants by revenue
+    merchants_ranked_by_revenue[0...num]
+  end
 
   def merchants_with_pending_invoices
     se.merchants.all.select do |merchant|
@@ -151,6 +167,98 @@ class SalesAnalyst
     se.merchants.all.select do |merchant|
       merchant.num_items == 1
     end
+  end
+
+  def find_month(date)
+    date.strftime("%B")
+  end
+
+  def merchants_with_only_one_item_registered_in_month(month)
+    merchants_with_only_one_item.find_all do |merchant|
+      merchant.created_at.strftime("%B").include?(month)
+    end
+  end
+  
+  def total_invoice_items_revenue(total, invoice)
+    invoice.find_invoice_items.inject(0) do |total, item|
+      total += item.unit_price * item.quantity 
+    end
+  end
+
+  def revenue_by_merchant(merchant_id)
+    paid_invoices = se.merchants.find_all_invoices_by_id(merchant_id).select do |invoice|
+      invoice.is_paid_in_full?
+    end
+    revenue = paid_invoices.reduce(0) do |total, invoice|
+      total += total_invoice_items_revenue(total, invoice)
+    end
+    BigDecimal.new(revenue).round(2)
+  end
+
+  def merchants_ranked_by_revenue
+    sorted_merchants = se.merchants.all.sort_by do |merchant| 
+      revenue_by_merchant(merchant.id)
+    end.reverse
+  end
+
+  def most_sold_item_for_merchant(merchant_id)
+  #returns an item array if there is a tie, or a single item if there isn't'
+    all_quantities = find_all_invoice_items_for_merchant(merchant_id).map do |invoice_item|
+      invoice_item.map do |item|
+        Hash[item.item_id => item.quantity]
+      end
+    end.flatten
+    all_quantity_per_item = all_quantities.inject do |item, element|
+      item.merge(element) do |k, old, present|
+       old + present
+      end
+    end
+    top_quantity = 0
+    top_items = []
+    all_quantity_per_item.each do |key, value|
+      if value > top_quantity
+        top_quantity = value
+        top_items.pop
+        top_items << key
+      elsif value == top_quantity
+        top_items << key
+      end
+    end
+    top_items.map do |item|
+      se.items.find_by_id(item)
+    end
+  end
+
+  def find_all_invoice_items_for_merchant(merchant_id)
+   invoices_with_ids = se.find_all_invoices_by_id(merchant_id).map do |invoice|
+      invoice.id if invoice.is_paid_in_full?
+    end.compact
+    invoice_items = invoices_with_ids.map do |invoice_id|
+      se.find_invoice_items(invoice_id)
+    end
+  end
+
+  def best_item_for_merchant(merchant_id)
+    all_revenue = find_all_invoice_items_for_merchant(merchant_id).map do |invoice_item|
+      invoice_item.map do |item|
+        item_revenue = item.unit_price * item.quantity
+        Hash[item.item_id => item_revenue]
+      end
+    end.flatten
+    all_revenue_per_item = all_revenue.inject do |item, element|
+      item.merge(element) do |k, old, present|
+       old + present
+      end
+    end
+    top_value = 0
+    best_item = 0
+    all_revenue_per_item.each do |key, value|
+      if value > top_value
+        top_value = value
+        best_item = key
+      end
+    end
+    se.items.find_by_id(best_item)    
   end
 
 end
