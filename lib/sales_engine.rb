@@ -23,7 +23,6 @@ class SalesEngine
                 :transactions,
                 :invoice_items
   
-
   def self.from_csv(files)
     @merchant_repo     = MerchantRepo.new(files[:merchants], self)
     @item_repo         = ItemRepo.new(files[:items], self)
